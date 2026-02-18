@@ -35,21 +35,20 @@ def test_build_input():
     assert got.model_dump() == want.model_dump()
 
 
-# def test_build_feature_array():
-#    got = sample_input.copy()
-#
-#    want = np.array([[20, 20, 20, 0, 1, 20, 20, 20]], dtype=np.float32)
-#
-#    assert np.array_equal(build_feature_array(build_input(**got)), want)
-#
-#
-##
-# def test_get_top_predictions():
-#    got = np.array([0.1, 0.2, 0.3, 0.1, 0.1, 0.05, 0.15], dtype=np.float32)
-#    want = [
-#        "10-26-26",
-#        "14-35-14",
-#        "17-17-17",
-#    ]
-#
-#    assert get_top_predictions(got) == want
+def test_build_feature_array():
+    got = sample_input.copy()
+    want = np.array([[20, 20, 20, 0, 1, 20, 20, 20]], dtype=np.float32)
+
+    assert np.array_equal(build_feature_array(build_input(got)), want)
+
+
+def test_get_top_predictions():
+    inp = np.array([[0.1, 0.2, 0.3, 0.1, 0.1, 0.05, 0.15]], dtype=np.float32)
+    got = get_top_predictions(inp)
+    want = [
+        "17-17-17",
+        "14-35-14",
+        "Urea",
+    ]
+
+    assert got == want
