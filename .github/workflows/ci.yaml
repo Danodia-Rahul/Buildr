@@ -1,9 +1,11 @@
 name: Continuous Integration
+
 on:
   workflow_dispatch:
   push:
     branches:
       - main
+
 jobs:
   test:
     name: pytest tests
@@ -11,31 +13,39 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v4
+
       - name: setup python environment
         uses: actions/setup-python@v5
         with:
           python-version: "3.14"
           cache: "pip"
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirement-dev.txt
+          pip install -r requirements-dev.txt
+
       - name: Run pytest test
         run: pytest
+
   lint:
     name: ruff lint
     runs-on: ubuntu-latest
     steps:
       - name: checkout code
         uses: actions/checkout@v4
+
       - name: setup python environment
         uses: actions/setup-python@v5
         with:
           python-version: "3.14"
+
       - name: install lint tools
         run: pip install ruff black isort
+
       - name: run ruff
         run: ruff check .
+
       - name: check formatting
         run: |
           black --check .
