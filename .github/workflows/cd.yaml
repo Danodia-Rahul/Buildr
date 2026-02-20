@@ -26,10 +26,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Set short SHA
+        run: echo "SHORT_SHA=$(GITHUB_SHA::7)" >> $GITHUB_ENV
+
       - name: Build and Push
         uses: docker/build-push-action@v6
         with:
           push: true
           tags: |
             ${{ env.IMAGE_NAME }}:latest
-            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:${{ env.SHORT_SHA }}
