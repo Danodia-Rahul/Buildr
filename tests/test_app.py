@@ -1,7 +1,10 @@
 import numpy as np
+import pytest
+from fastapi.testclient import TestClient
 
 from app.app import (
     PredictionInput,
+    app,
     build_feature_array,
     build_input,
     get_top_predictions,
@@ -52,3 +55,18 @@ def test_get_top_predictions():
     ]
 
     assert got == want
+
+
+@pytest.fixture
+def client():
+    return TestClient(app)
+
+
+def test_home(client):
+    response = client.get("/")
+    assert response.status_code == 200
+
+
+def test_health(client):
+    response = client.get("/health")
+    assert response.status_code == 200
