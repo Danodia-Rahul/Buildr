@@ -1,31 +1,52 @@
+# ============================================
+# Continuous Deployment Workflow
+# Builds and pushes Docker image after CI succeeds
+# ============================================
+
 name: Continuous Deployment
 
 on:
+  # Manual trigger
   workflow_dispatch:
+
+  # Trigger after "Continuous Integration" workflow completes
   workflow_run:
     workflows:
       - Continuous Integration
     types:
       - completed
 
+# Docker image name constructed from repository variables
 env:
   IMAGE_NAME: ${{ vars.DOCKER_HUB_USER_NAME }}/${{ vars.DOCKER_REPO_NAME }}
 
 jobs:
   build-image:
     name: Build Docker Image
+
+    # Run only if:
+    # 1) Manually triggered OR
+    # 2) CI completed successfully AND branch is main
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' && 
       github.event.workflow_run.head_branch == 'main')
 
     runs-on: ubuntu-latest
+
+    # Prevent parallel deployments; cancel previous run if new one starts
+    concurrency:
+      group: deployment
+      cancel-in-progress: true
+
     steps:
+      # Checkout the exact commit that triggered CI
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
 
+      # Generate Docker image tags (branch, sha, latest for default branch)
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -36,15 +57,18 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha
 
+      # Authenticate with Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKER_HUB_USER_NAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
+      # Enable advanced Docker builds
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # Build and push image to Docker Hub
       - name: Build and Push
         uses: docker/build-push-action@v6
         with:
