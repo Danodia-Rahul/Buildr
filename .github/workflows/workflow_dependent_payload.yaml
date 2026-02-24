@@ -1,0 +1,46 @@
+# ============================================
+# Debug Event Workflow
+# ============================================
+# This workflow is used to inspect and debug
+# GitHub Actions event payloads.
+# It prints useful metadata and the full event JSON.
+
+name: Debug Event
+
+on:
+  # Trigger on every push to any branch
+  push:
+
+  # Allow manual execution from the GitHub UI
+  workflow_dispatch:
+
+  # Trigger when another workflow completes
+  workflow_run:
+    # Name of the workflow to listen to
+    workflows: ["Continuous Integration"]
+
+    # Run only when that workflow has finished
+    types: [completed]
+
+# ============================================
+# JOB: Print GitHub Event Information
+# ============================================
+jobs:
+  debug:
+    name: debug cd
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Information Output
+        run: |
+          # Print basic event metadata
+          echo "EVENT_NAME: ${{ github.event_name }}"
+          echo "REF_NAME: ${{ github.ref_name }}"
+          echo "SHA: ${{ github.sha }}"
+
+          echo "-------- FULL EVENT ---------"
+
+          # Print the entire event payload (JSON)
+          # $GITHUB_EVENT_PATH contains the file path
+          # to the event JSON provided by GitHub
+          jq . $GITHUB_EVENT_PATH
