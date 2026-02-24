@@ -1,61 +1,110 @@
+# ============================================
+# Continuous Integration (CI) Workflow
+# ============================================
+# This workflow automatically runs tests and linting
+# whenever code is pushed or a pull request is created.
+# It ensures the project stays healthy and consistent.
+
 name: Continuous Integration
 
+# --------------------------------------------
+# When should this workflow run?
+# --------------------------------------------
 on:
+  # Allows you to manually trigger the workflow
+  # from the GitHub Actions UI
   workflow_dispatch:
+
+  # Runs on every pull request targeting ANY branch
   pull_request:
     branches:
       - "**"
+
+  # Runs on every push to ANY branch
   push:
     branches:
       - "**"
 
+# ============================================
+# JOB 1: Run Unit Tests with pytest
+# ============================================
 jobs:
   test:
+    # This job runs automated tests
     name: pytest tests
+
+    # The virtual machine environment to run on
     runs-on: ubuntu-latest
+
     steps:
-      - name: checkout code
+      # Step 1: Download the repository code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: setup python environment
+      # Step 2: Install Python
+      # Uses GitHub's official Python setup action
+      - name: Setup Python environment
         uses: actions/setup-python@v5
         with:
-          python-version: "3.14"
-          cache: "pip"
+          python-version: "3.14" # Python version to use
+          cache: "pip" # Enables pip dependency caching for faster builds
 
+      # Step 3: Install project dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
-      - name: Run pytest test
+      # Step 4: Run the test suite
+      - name: Run pytest
         run: pytest
 
+  # ============================================
+  # JOB 2: Linting & Code Formatting Checks
+  # ============================================
   lint:
+    # This job checks code quality and formatting
     name: ruff lint
+
     runs-on: ubuntu-latest
+
     steps:
-      - name: checkout code
+      # Step 1: Download repository code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: setup python environment
+      # Step 2: Install Python
+      - name: Setup Python environment
         uses: actions/setup-python@v5
         with:
           python-version: "3.14"
 
-      - name: install lint tools
+      # Step 3: Install linting & formatting tools
+      - name: Install lint tools
         run: pip install ruff black isort
 
-      - name: run ruff
+      # Step 4: Run Ruff linter (checks for code issues)
+      - name: Run ruff
         run: ruff check .
 
-      - name: check formatting
+      # Step 5: Check formatting (does NOT modify code)
+      # --check makes the job fail if formatting is incorrect
+      - name: Check formatting
         run: |
           black --check .
           isort --check-only app/ tests/
+
+  # ============================================
+  # JOB 3: Debug GitHub Event (Optional Utility)
+  # ============================================
+  # This job prints useful GitHub context information.
+  # Helpful for understanding what data is available
+  # during push or pull request events.
   debug:
     name: debug ci
+
     runs-on: ubuntu-latest
+
     steps:
       - name: Information CI
         run: |
@@ -63,4 +112,7 @@ jobs:
           echo "REF NAME: ${{ github.ref_name }}"
           echo "SHA: ${{ github.sha }}"
           echo "---- FULL EVENT ----"
+
+          # Print the entire GitHub event JSON payload
+          # jq formats the JSON nicely
           jq . $GITHUB_EVENT_PATH
