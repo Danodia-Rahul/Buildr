@@ -24,9 +24,10 @@ jobs:
   build-image:
     name: Build Docker Image
 
-    # Run only if:
-    # 1) Manually triggered OR
-    # 2) CI completed successfully AND branch is main
+    # conditions to run this workflow
+    # ci workflow should have completed first with success and
+    # changes were pushed to main branch
+    # or manual trigger
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' && 
@@ -34,7 +35,8 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    # Prevent parallel deployments; cancel previous run if new one starts
+    # in the case of multiple pushed back to back.
+    # previous run should be canceled and new one should start.
     concurrency:
       group: deployment
       cancel-in-progress: true
@@ -46,7 +48,9 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
 
-      # Generate Docker image tags (branch, sha, latest for default branch)
+      # automatic tags for docker images
+      # commit sha and branch name
+      # if push is to main branch then latest tag is also created.
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
