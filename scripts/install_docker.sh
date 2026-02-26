@@ -11,12 +11,14 @@ fi
 echo "Installing Docker on EC2 instance $INSTANCE_ID"
 
 aws ssm send-command \
-	--targets "key=instanceIds,Values=$INSTANCE_ID" \
+	--targets "Key=instanceids,Values=$INSTANCE_ID" \
 	--document-name "AWS-RunShellScript" \
+	--comment "Install Docker" \
 	--parameters 'commands=[
 	  "sudo dnf update -y",
 	  "sudo dnf install -y docker",
-	  "sudo service docker start",
+	  "sudo systemctl enbale docker",
+	  "sudo systemctl start docker",
 	  "sudo usermod -a -G docker ec2-user"
 	]'
 
