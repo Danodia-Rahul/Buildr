@@ -141,4 +141,4 @@ jobs:
           cd scripts/
           bash deploy_app.sh "${{steps.tf_outputs.outputs.instance_id}}" \
                              "${{ env.IMAGE_NAME }}" \
-                             "${{steps.tf_outputs.outputs.outputspublic_ip}}"
+                             "${{steps.tf_outputs.outputs.public_ip}}"
