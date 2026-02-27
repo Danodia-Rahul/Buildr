@@ -26,7 +26,7 @@ if [[ -n "$PUBLIC_IP" ]]; then
 	echo "Runnig external health check on http://$PUBLIC_IP:8000"
 
 	for i in {1..10}; do
-		HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://$PUBLIC_IP:8000)
+		HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://$PUBLIC_IP:8000 || true)
 
 		if [[ "$HTTP_STATUS" == "200" ]]; then
 			echo "External health check passed!!!"
@@ -36,7 +36,7 @@ if [[ -n "$PUBLIC_IP" ]]; then
 		sleep 5
 	done
 
-	if [[ "HTTP_STATUS" != "200" ]]; then
+	if [[ "$HTTP_STATUS" != "200" ]]; then
 		echo "External health check failed."
 		exit 1
 	fi
