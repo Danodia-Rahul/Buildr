@@ -133,7 +133,7 @@ jobs:
       - name: Install docker
         run: |
           cd scripts/
-          bash install_docker.sh "${{ steps.tf_outputs.instance_id }}"
+          bash install_docker.sh "${{ steps.tf_outputs.outputs.instance_id }}"
 
         # deploy application to ec2 with aws ssm
       - name: Deploy application
@@ -141,4 +141,4 @@ jobs:
           cd scripts/
           bash deploy_app.sh "${{steps.tf_outputs.outputs.instance_id}}" \
                              "${{ env.IMAGE_NAME }}" \
-                             "${{steps.tf_outputs.outputspublic_ip}}"
+                             "${{steps.tf_outputs.outputs.outputspublic_ip}}"
