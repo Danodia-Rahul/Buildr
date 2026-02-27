@@ -13,7 +13,7 @@ fi
 echo "Deploy docker container $IMAGE_NAME to EC2 Instance $INSTANCE_ID"
 
 aws ssm send-command \
-	--targets "Key=instanceids,Values=$INSTACE_ID" \
+	--targets "Key=instanceids,Values=$INSTANCE_ID" \
 	--document-name "AWS-RunShellScript" \
 	--comment "Deploying app" \
 	--parameters 'commands=[
