@@ -5,7 +5,7 @@ INSTANCE_ID="$1"
 IMAGE_NAME="$2"
 PUBLIC_IP="$3"
 
-if [[ -z "$INSTACE_ID" ]] || [[ -z "$IMAGE_NAME" ]]; then
+if [[ -z "$INSTANCE_ID" ]] || [[ -z "$IMAGE_NAME" ]]; then
 	echo "Instance Id or Image Name is not provided.."
 	exit 1
 fi
