@@ -80,34 +80,45 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+  # deploying to AWS EC2
   deploy:
     name: Deploy the application to AWS EC2
     runs-on: ubuntu-latest
+
+    # There should be docker image for the new changes already on docker hub
+    # This job will run after docker image job is done.
     needs: [build-image]
     permissions:
       id-token: write
       contents: read
+
     steps:
+      # Chekcout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+        # configuring AWS with github actions to make infrastrucutre on cloud.
+        # using oidc
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::208822006913:role/buildr-github-actions-role
           aws-region: us-east-1
 
+        # Setting up terraform
       - name: Setup Terraform
-        uses: hashicorp/setup-terrform@v3
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
 
+        # build infrastructure.
       - name: Terraform init and Apply
         run: |
           cd infra/
           terraform init
           terraform apply -auto-approve
 
+        # get the instance id's and public for testing.
       - name: Get instance id and public ip
         id: tf_outputs
         run: |
@@ -118,11 +129,13 @@ jobs:
           echo "instance_id=$ID" >> $GITHUB_OUTPUT
           echo "public_ip=$IP" >> $GITHUB_OUTPUT
 
+        # install docker on ec2 instance with aws ssm
       - name: Install docker
         run: |
           cd scripts/
           bash install_docker.sh "${{ steps.tf_outputs.instance_id }}"
 
+        # deploy application to ec2 with aws ssm
       - name: Deploy application
         run: |
           cd scripts/
