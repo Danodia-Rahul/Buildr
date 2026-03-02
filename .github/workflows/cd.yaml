@@ -142,3 +142,7 @@ jobs:
           bash deploy_app.sh "${{steps.tf_outputs.outputs.instance_id}}" \
                              "${{ env.IMAGE_NAME }}" \
                              "${{steps.tf_outputs.outputs.public_ip}}"
+
+        # destroy the infrastructure
+      - name: Terraform destroy infrastructure
+        run: terraform destroy -auto-approve
