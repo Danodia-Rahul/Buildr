@@ -30,7 +30,7 @@ if [[ -n "$PUBLIC_IP" ]]; then
 
 		if [[ "$HTTP_STATUS" == "200" ]]; then
 			echo "External health check passed!!!"
-			exit 1
+			exit 0
 		fi
 		echo "Waiting for app to become healthy"
 		sleep 5
