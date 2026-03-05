@@ -102,7 +102,7 @@ This guarantees that **only verified code is deployed** and that deployments rem
 
 ---
 
-# Infrastructure & Deployment
+# Infrastructure
 
 Infrastructure is provisioned using **Terraform**, enabling fully reproducible cloud environments.
 
@@ -114,23 +114,6 @@ Resources provisioned include:
 * S3 bucket for Terraform remote state
 
 After the infrastructure is created, all subsequent deployments are handled automatically by the **CI/CD pipeline**.
-
----
-
-# Deployment Workflow
-
-The deployment process follows a fully automated flow:
-
-1. Developer pushes code to GitHub
-2. GitHub Actions runs **linting and unit tests**
-3. On merges to `main`:
-
-   * Docker image is built
-   * Image is tagged using the Git commit SHA
-   * Image is pushed to the container registry
-4. The EC2 instance pulls the new image and updates the running container
-
-This workflow demonstrates **end-to-end CI/CD automation from commit to production deployment**.
 
 ---
 
@@ -153,8 +136,8 @@ This project highlights several important DevOps practices:
 Clone the repository:
 
 ```
-git clone https://github.com/<your-username>/<repo-name>.git
-cd <repo-name>
+git clone https://github.com/Danodia-Rahul/Buildr.git
+cd Buildr
 ```
 
 Create a virtual environment and install dependencies:
